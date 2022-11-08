@@ -88,8 +88,35 @@ export class BasicEditor extends HTMLElement {
     private formatingKeys(event: KeyboardEvent) {
         switch (event.key) {
             case 'Delete':
+                let currentChar = currentLine.querySelector('span.active');
+                let nextChar = currentChar?.nextSibling;
+                if (nextChar?.nodeName === 'SPAN') {
+                    currentLine.removeChild(nextChar);
+                }
+
+                this.checkAndRemoveLine();
                 break;
             case 'Backspace':
+                let currentActiveChar = currentLine.querySelector('span.active');
+                let prevChar = <HTMLElement>currentActiveChar?.previousSibling;
+                // 
+                if (
+                    currentActiveChar?.nodeName === 'SPAN' &&
+                    (
+                        (
+                            this.children[0] !== currentLine &&
+                            currentLine.children[0] !== currentActiveChar) ||
+                        (
+                            currentLine.children.length > 1
+                            && currentLine.children[0] !== currentActiveChar
+                        )
+                    )) {
+                    currentLine.removeChild(currentActiveChar);
+                    if (prevChar?.nodeName === 'SPAN') {
+                        prevChar.classList.add('active');
+                    }
+                }
+                this.checkAndRemoveLine();
                 break;
             case 'Clear':
                 break;
@@ -133,6 +160,17 @@ export class BasicEditor extends HTMLElement {
         divElement.append(_span);
         currentLine = divElement;
         this.appendChild(divElement);
+    }
+
+    private checkAndRemoveLine() {
+        if (currentLine.children.length <= 1 && this.children.length !== 1) {
+            this.removeChild(currentLine);
+            currentLine = <HTMLElement>this.children[this.children.length - 1];
+            currentLine.children[currentLine.children.length - 1].classList.add('active');
+        }
+        if (this.children.length === 0) {
+            this.enterNewLine();
+        }
     }
 
 }
