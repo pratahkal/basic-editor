@@ -24,6 +24,8 @@ export class BasicEditor extends HTMLElement {
         this.enterNewLine();
         this.initEvents();
         this.focus();
+
+        this.animatedType('Kindly, write here...');
     }
     
     disconnectedCallback() {
@@ -121,6 +123,7 @@ export class BasicEditor extends HTMLElement {
             case 'Clear':
                 break;
             case 'Escape':
+                this.removeAllRangeSelection();
                 break;
             default:
                 break;
@@ -173,8 +176,12 @@ export class BasicEditor extends HTMLElement {
                 }
                 break;
             case 'Home':
+                activeElement?.classList.remove('active');
+                currentLine.children[0].classList.add('active');
                 break;
             case 'End':
+                activeElement?.classList.remove('active');
+                currentLine.children[currentLine.children.length - 1].classList.add('active');
                 break;
             case 'PageUp':
                 break;
@@ -216,6 +223,34 @@ export class BasicEditor extends HTMLElement {
         }
         return -1;
     }
+
+    private removeAllRangeSelection() {
+        let _selection = window.getSelection();
+        _selection?.removeAllRanges();
+    }
+
+    private dispatchKeyboardkeys(txt: string, isEVentKey: boolean = false, eventInstance?: HTMLElement) {
+        if (isEVentKey) {
+            (eventInstance || this).dispatchEvent(new KeyboardEvent('keyup', { 'key': txt }));
+        } else {
+            txt.split('').forEach((ch: string) => {
+                (eventInstance || this).dispatchEvent(new KeyboardEvent('keyup', { 'key': ch }));
+            });
+        }
+    }
+
+    private animatedType(txt: string = 'Kindly, write here...', delay: number = 100) {
+        let typeChars = txt.split('');
+        let counter = 0;
+        let intervalChrs = setInterval(() => {
+            this.dispatchKeyboardkeys(typeChars[counter]);
+            ++counter;
+            if (counter >= typeChars.length) {
+                clearInterval(intervalChrs);
+            }
+        }, delay);
+    }
+
 }
 
 customElements.define("basic-editor", BasicEditor);
