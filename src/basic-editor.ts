@@ -15,7 +15,6 @@ export class BasicEditor extends HTMLElement {
 
     connectedCallback() {
         console.log('Editor connected');
-        this.innerHTML = '<h1>Welcome...</h1>'
 
         /**
          * Tabindex is mandatory to capture the keyboard events
