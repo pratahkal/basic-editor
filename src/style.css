@@ -15,9 +15,32 @@
   -webkit-text-size-adjust: 100%;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+}
+
+basic-editor {
+  position: relative;
+  resize:both;
+  overflow:auto;
+  min-height: 40vh;
+  border: 3px dotted #fff;
+  display: block;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
+  }
+
+  basic-editor {
+    position: relative;
+    resize:both;
+    overflow:auto;
+    min-height: 40vh;
+    border: 3px dotted #000;
+    display: block;
   }
 }
