@@ -1,5 +1,6 @@
 import './style.css'
+import './basic-editor';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <h1>Welcome</h1>
+  <basic-editor></basic-editor>
 `;
