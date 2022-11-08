@@ -128,14 +128,49 @@ export class BasicEditor extends HTMLElement {
     }
 
     private handleNavigation(event: KeyboardEvent) {
+
+        const activeElement = <HTMLElement>currentLine.querySelector('span.active');
         switch (event.key) {
             case 'ArrowUp':
+                let previousLineElement = <HTMLElement>currentLine.previousSibling;
+
+                if (previousLineElement?.nodeName === 'DIV') {
+                    activeElement?.classList.remove('active');
+                    let childIndex = this.findTheChildIndex(currentLine, activeElement);
+                    currentLine = previousLineElement;
+                    if (currentLine.children[childIndex]) {
+                        currentLine.children[childIndex].classList.add('active');
+                    } else {
+                        currentLine.children[currentLine.children.length - 1].classList.add('active');
+                    }
+                }
                 break;
             case 'ArrowDown':
+                let nextLineElement = <HTMLElement>currentLine.nextSibling;
+                if (nextLineElement?.nodeName === 'DIV') {
+                    activeElement?.classList.remove('active');
+                    let childIndex = this.findTheChildIndex(currentLine, activeElement);
+                    currentLine = nextLineElement;
+                    if (currentLine.children[childIndex]) {
+                        currentLine.children[childIndex].classList.add('active');
+                    } else {
+                        currentLine.children[currentLine.children.length - 1].classList.add('active');
+                    }
+                }
                 break;
             case 'ArrowRight':
+                let nextElement = <HTMLElement>(activeElement?.nextSibling);
+                if (nextElement?.nodeName === 'SPAN') {
+                    activeElement?.classList.remove('active');
+                    nextElement?.classList.add('active');
+                }
                 break;
             case 'ArrowLeft':
+                let previousElement = <HTMLElement>(activeElement?.previousSibling);
+                if (previousElement?.nodeName === 'SPAN') {
+                    activeElement?.classList.remove('active');
+                    previousElement?.classList.add('active');
+                }
                 break;
             case 'Home':
                 break;
@@ -173,6 +208,14 @@ export class BasicEditor extends HTMLElement {
         }
     }
 
+    private findTheChildIndex(parent: HTMLElement, child: HTMLElement) {
+        for (let i = 0; i < parent.children.length; i++) {
+            if (parent.children[i] === child) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }
 
 customElements.define("basic-editor", BasicEditor);
