@@ -74,14 +74,16 @@ export class BasicEditor extends HTMLElement {
     }
 
     private initEvents() {
-        this.addEventListener('keyup', e => this.keyupEvent(e))
-        this.addEventListener('keydown', e => this.keydownEvent(e))
-        this.addEventListener('focusout', e => this.focusoutEvent(e))
+        this.addEventListener('keyup', e => this.keyupEvent(e));
+        this.addEventListener('keydown', e => this.keydownEvent(e));
+        this.addEventListener('click', e => this.clickEvent(e));
+        this.addEventListener('focusout', e => this.focusoutEvent(e));
     }
 
     private removeEvents() {
         this.removeEventListener('keyup', () => null);
         this.removeEventListener('keydown', () => null);
+        this.removeEventListener('click', () => null);
         this.removeEventListener('focusout', () => null);
     }
 
@@ -107,6 +109,21 @@ export class BasicEditor extends HTMLElement {
                 e.preventDefault();
                 this.focus();
             }
+        }
+    }
+
+    private clickEvent(e: MouseEvent) {
+        let _node = <HTMLElement>e.target;
+        if (_node?.nodeName === 'SPAN') {
+            currentLine.querySelector('span.active')?.classList.remove('active');
+            _node.classList.add('active');
+            let _parentDiv = <HTMLElement>_node.parentElement;
+            currentLine = _parentDiv;
+        }
+        if (_node?.nodeName === 'DIV') {
+            currentLine.querySelector('span.active')?.classList.remove('active');
+            currentLine = <HTMLElement>e.target;
+            currentLine.children[currentLine.children.length - 1]?.classList.add('active');
         }
     }
 
