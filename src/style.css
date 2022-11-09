@@ -29,6 +29,36 @@ basic-editor {
   display: block;
 }
 
+basic-editor div.line {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+basic-editor:focus:not([disabled="true"]) div.line span.active {
+  border-right: 2px solid #ffffff;
+  animation: blink-dark 0.5s step-end infinite;
+}
+
+@keyframes blink-dark {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: #fff;
+  }
+}
+
+@keyframes blink-light {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: #000;
+  }
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -42,5 +72,10 @@ basic-editor {
     min-height: 40vh;
     border: 3px dotted #000;
     display: block;
+  }
+
+  basic-editor:focus:not([disabled="true"]) div.line span.active {
+    border-right: 2px solid #000000;
+    animation: blink-light 1s step-end infinite;
   }
 }
