@@ -79,6 +79,8 @@ export class BasicEditor extends HTMLElement {
     private handleSpecialKeys(event: KeyboardEvent) {
         switch (event.key) {
             case 'Enter':
+                    currentLine.querySelector('span.active')?.classList.remove('active');
+                    this.enterNewLine();
                 break;
         }
     }
