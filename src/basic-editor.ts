@@ -5,9 +5,26 @@ const allowedTextKeys = `qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM012
 // const formatingKeys = 'Delete Backspace Clear';
 // const navigationKeys = 'ArrowUp ArrowDown ArrowRight ArrowLeft Home End PageUp PageDown';
 
+export interface EditorOptions {
+    isFocus: boolean;
+    initialMessage: string;
+    tabForceFocus: boolean;
+    focusoutForceFocus: boolean;
+    disabled: boolean;
+    disableNextLine: boolean;
+}
+
 let currentLine: HTMLElement;
 
 export class BasicEditor extends HTMLElement {
+    private options: EditorOptions = {
+        isFocus: false,
+        initialMessage: '',
+        tabForceFocus: false,
+        focusoutForceFocus: false,
+        disabled: false,
+        disableNextLine: false,
+    };
 
     constructor() {
         super();
@@ -20,16 +37,32 @@ export class BasicEditor extends HTMLElement {
          * Tabindex is mandatory to capture the keyboard events
          */
         this.setAttribute('tabindex', "0");
-
+        this.options.isFocus = this.getAttribute('focus') === 'true' ? true : false;
+        this.options.initialMessage = <string>this.getAttribute('initial-message');
+        this.options.tabForceFocus = this.getAttribute('tab-force-focus') === 'true' ? true : false;
+        this.options.focusoutForceFocus = this.getAttribute('focusout-force-focus') === 'true' ? true : false;
+        this.options.disabled = this.getAttribute('disabled') === 'true' ? true : false;
+        this.options.disableNextLine = this.getAttribute('disable-next-line') === 'true' ? true : false;
+        
         this.enterNewLine();
-        this.initEvents();
-        this.focus();
 
-        this.animatedType('Kindly, write here...');
+        if (!this.options.disabled) {
+            this.initEvents();
+        }
+        if (this.options.isFocus && !this.options.disabled) {
+            this.focus();
+        }
+        if (this.options.initialMessage) {
+            this.animatedType(this.options.initialMessage);
+        }
+        if (this.options.initialMessage && this.options.disabled) {
+            this.typeContent(this.options.initialMessage);
+        }
     }
     
     disconnectedCallback() {
         console.log('Editor disconnected');
+        this.removeEvents();
     }
 
     adoptedCallback() {
@@ -41,16 +74,40 @@ export class BasicEditor extends HTMLElement {
     }
 
     private initEvents() {
-        this.addEventListener('keyup', (e: KeyboardEvent) => this.keyupEvent(e))
+        this.addEventListener('keyup', e => this.keyupEvent(e))
+        this.addEventListener('keydown', e => this.keydownEvent(e))
+        this.addEventListener('focusout', e => this.focusoutEvent(e))
+    }
+
+    private removeEvents() {
+        this.removeEventListener('keyup', () => null);
+        this.removeEventListener('keydown', () => null);
+        this.removeEventListener('focusout', () => null);
+    }
+
+    private focusoutEvent(e: Event) {
+        if (this.options.focusoutForceFocus) {
+            e.preventDefault();
+            this.focus();
+        }
     }
 
     private keyupEvent(e: KeyboardEvent) {
-        console.log('Editor Capture keyboard keyup event:- ', e, e.key);
+        // console.log('Editor Capture keyboard keyup event:- ', e, e.key);
         this.handleText(e);
         this.handleNavigation(e);
         this.formatingKeys(e);
         this.handleSpecialKeys(e);
 
+    }
+
+    private keydownEvent(e: KeyboardEvent) {
+        if (e.key === 'Tab') {
+            if (this.options.tabForceFocus) {
+                e.preventDefault();
+                this.focus();
+            }
+        }
     }
 
     private handleText(event: KeyboardEvent) {
@@ -81,8 +138,10 @@ export class BasicEditor extends HTMLElement {
     private handleSpecialKeys(event: KeyboardEvent) {
         switch (event.key) {
             case 'Enter':
+                if(!this.options.disableNextLine) {
                     currentLine.querySelector('span.active')?.classList.remove('active');
                     this.enterNewLine();
+                }
                 break;
         }
     }
@@ -237,6 +296,18 @@ export class BasicEditor extends HTMLElement {
                 (eventInstance || this).dispatchEvent(new KeyboardEvent('keyup', { 'key': ch }));
             });
         }
+    }
+
+    private typeContent(txt: string, line?: HTMLElement): HTMLElement {
+        let resHTML: string = '';
+        let _line: HTMLElement = line || currentLine;
+        if (txt) {
+            txt.split('').forEach((ch: string) => {
+                resHTML += `<span>${ch}</span>`;
+            });
+            _line.innerHTML += resHTML;
+        }
+        return _line;
     }
 
     private animatedType(txt: string = 'Kindly, write here...', delay: number = 100) {
