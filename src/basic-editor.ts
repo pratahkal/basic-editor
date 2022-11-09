@@ -5,6 +5,8 @@ const allowedTextKeys = `qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM012
 // const formatingKeys = 'Delete Backspace Clear';
 // const navigationKeys = 'ArrowUp ArrowDown ArrowRight ArrowLeft Home End PageUp PageDown';
 
+let currentLine: HTMLElement;
+
 export class BasicEditor extends HTMLElement {
 
     constructor() {
@@ -19,6 +21,8 @@ export class BasicEditor extends HTMLElement {
          * Tabindex is mandatory to capture the keyboard events
          */
         this.setAttribute('tabindex', "0");
+
+        this.enterNewLine();
         this.initEvents();
         this.focus();
     }
@@ -50,7 +54,26 @@ export class BasicEditor extends HTMLElement {
 
     private handleText(event: KeyboardEvent) {
         if (allowedTextKeys.includes(event.key)) {
-            this.innerHTML += `${event.key}`;
+            let previousActive = <HTMLElement>currentLine.querySelector('span.active');
+            if (previousActive?.nodeName === 'SPAN') {
+                previousActive?.classList.remove('active');
+                let _span = document.createElement('span');
+                _span.classList.add('active');
+                if (event.key === ' ') {
+                    _span.innerHTML = '&nbsp;';
+                } else {
+                    _span.innerHTML = event.key;
+                }
+
+                // _span.after(previousActive);
+                currentLine.insertBefore(_span, previousActive.nextSibling)
+            } else {
+                if (event.key === ' ') {
+                    currentLine.innerHTML = '<span class="active">&nbsp;</span>'
+                } else {
+                    currentLine.innerHTML = `<span class="active">${event.key}</span>`
+                }
+            }
         }
     }
 
@@ -97,6 +120,18 @@ export class BasicEditor extends HTMLElement {
             default:
                 break;
         }
+    }
+
+    private enterNewLine() {
+        let divElement: HTMLDivElement = document.createElement('div');
+        divElement.classList.add('line');
+        let _span = document.createElement('span');
+        _span.classList.add('active');
+        _span.classList.add('line-start');
+        _span.innerHTML = ' ';
+        divElement.append(_span);
+        currentLine = divElement;
+        this.appendChild(divElement);
     }
 
 }
