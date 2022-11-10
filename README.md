@@ -6,7 +6,7 @@
 
 > This editor is just a proof of concept and not production ready, entirely design for learning perspective only.
 
-> some important features are missing in this editor. I have not yet implmented yet because of my busy schedule. Feel free to use this code and explore.
+> some important features are missing in this editor. I have not yet implmented because of my busy schedule. Feel free to use this code and explore.
 
 
 
