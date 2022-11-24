@@ -1,7 +1,7 @@
 # Basic-editor
 
 > This editor did not use any plugin or thirdparty library and purely written in Javascript and HTML.
-> Textare and Div[contenteditable="true"] is also not used to create this editor. 
+> Textarea and Div[contenteditable="true"] is also not used to create this editor. 
 > Developer have full control over user inputs.
 
 > This editor is just a proof of concept and not production ready, entirely design for learning perspective only.
